@@ -30,15 +30,18 @@
     border-radius: 14px;
     padding: 18px 12px;
     cursor: pointer;
-    transition: all 0.25s;
+    transition: transform .28s cubic-bezier(.22,1,.36,1), box-shadow .28s ease, border-color .25s ease;
     text-align: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    animation: btnIn .5s cubic-bezier(.22,1,.36,1) backwards;
+    animation-delay: calc(var(--i, 0) * 30ms);
   }
   .week-btn:hover {
     border-color: #3b82f6;
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(59,130,246,0.15);
   }
+  .week-btn:active { transform: translateY(-1px) scale(.97); }
   .week-btn.current {
     border-color: #3b82f6;
     background: linear-gradient(135deg, #3b82f6, #2563eb);
@@ -76,9 +79,10 @@
     cursor: pointer;
     font-size: 14px;
     color: #334155;
-    transition: all 0.2s;
+    transition: background .2s ease, border-color .2s ease, color .2s ease, transform .25s cubic-bezier(.22,1,.36,1);
   }
-  .back-btn:hover { background: #f1f5f9; }
+  .back-btn:hover { background: #f1f5f9; transform: translateX(-2px); }
+  .back-btn:active { transform: translateX(-1px) scale(.95); }
   .week-nav { display: flex; gap: 8px; align-items: center; }
   .nav-btn {
     background: #fff;
@@ -87,9 +91,10 @@
     padding: 10px 16px;
     cursor: pointer;
     font-size: 14px;
-    transition: all 0.2s;
+    transition: background .2s ease, border-color .2s ease, color .2s ease, transform .25s cubic-bezier(.22,1,.36,1);
   }
-  .nav-btn:hover:not(:disabled) { background: #eff6ff; border-color: #3b82f6; }
+  .nav-btn:hover:not(:disabled) { background: #eff6ff; border-color: #3b82f6; transform: translateY(-1px); }
+  .nav-btn:active:not(:disabled) { transform: scale(.94); }
   .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .week-title { font-size: 18px; font-weight: 700; color: #1e40af; min-width: 140px; text-align: center; }
 
@@ -115,7 +120,11 @@
     font-weight: 600;
     color: #475569;
   }
-  table.schedule thead th.today { background: #dbeafe; color: #1e40af; }
+  table.schedule thead th.today {
+    background: #dbeafe;
+    color: #1e40af;
+    animation: todayPulse 3.2s ease-in-out infinite;
+  }
   .period-col { width: 60px; background: #f8fafc; }
   .period-label { font-size: 12px; color: #64748b; font-weight: 600; }
   .period-time { font-size: 10px; color: #94a3b8; margin-top: 2px; }
@@ -129,12 +138,21 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: transform 0.15s;
+    transition: transform .32s cubic-bezier(.22,1,.36,1), box-shadow .32s ease, filter .32s ease;
     color: #fff;
     font-size: 12px;
     line-height: 1.4;
+    animation: blockIn .5s cubic-bezier(.22,1,.36,1) backwards;
+    animation-delay: calc(var(--i, 0) * 32ms);
   }
-  .course-block:hover { transform: scale(1.03); opacity: 0.92; }
+  table.schedule[data-dir="1"] .course-block,
+  table.schedule[data-dir="-1"] .course-block { animation: none; }
+  .course-block:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 10px 22px rgba(15,23,42,0.22);
+    filter: brightness(1.06);
+  }
+  .course-block:active { transform: scale(.97); }
   .course-name { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
   .course-loc { font-size: 11px; opacity: 0.9; }
   .course-teacher { font-size: 10px; opacity: 0.8; margin-top: 2px; }
@@ -160,8 +178,11 @@
     z-index: 100;
     justify-content: center;
     align-items: center;
+    opacity: 0;
+    transition: opacity .24s ease;
   }
   .modal-mask.show { display: flex; }
+  .modal-mask.visible { opacity: 1; }
   .modal {
     background: #fff;
     border-radius: 16px;
@@ -169,6 +190,15 @@
     max-width: 360px;
     width: 90%;
     box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateY(18px) scale(.94);
+    transition: opacity .26s ease, transform .34s cubic-bezier(.22,1,.36,1);
+  }
+  .modal-mask.visible .modal { opacity: 1; transform: none; }
+  .modal-bar {
+    height: 4px;
+    border-radius: 16px 16px 0 0;
+    margin: -24px -24px 18px;
   }
   .modal h3 { margin-bottom: 12px; color: #1e40af; }
   .modal p { margin: 6px 0; font-size: 14px; color: #475569; }
@@ -182,7 +212,10 @@
     border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
+    transition: background .2s ease, transform .25s cubic-bezier(.22,1,.36,1);
   }
+  .modal .close-btn:hover { background: #2563eb; }
+  .modal .close-btn:active { transform: scale(.96); }
 
   @media (max-width: 768px) {
     .container { padding: 10px; }
@@ -242,4 +275,39 @@
     .week-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .week-num { font-size: 14px; }
     .week-date { font-size: 10px; }
+  }
+
+  /* ===== 动画增强 ===== */
+  :focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
+
+  .view-enter { animation: viewIn .45s cubic-bezier(.22,1,.36,1); }
+  .view-exit  { animation: viewExit .16s ease forwards; }
+  @keyframes viewIn   { from { opacity: 0; transform: translateY(16px); } }
+  @keyframes viewExit { to   { opacity: 0; transform: translateY(-8px); } }
+
+  @keyframes btnIn    { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+  @keyframes blockIn  { from { opacity: 0; transform: scale(.86) translateY(8px); } }
+
+  table.schedule.anim-out-left  { animation: tableOutLeft .18s ease forwards; }
+  table.schedule.anim-out-right { animation: tableOutRight .18s ease forwards; }
+  table.schedule.anim-in-left   { animation: tableInLeft .42s cubic-bezier(.22,1,.36,1); }
+  table.schedule.anim-in-right  { animation: tableInRight .42s cubic-bezier(.22,1,.36,1); }
+  @keyframes tableOutLeft  { to { opacity: 0; transform: translateX(-14px); } }
+  @keyframes tableOutRight { to { opacity: 0; transform: translateX(14px); } }
+  @keyframes tableInLeft   { from { opacity: 0; transform: translateX(-20px); } }
+  @keyframes tableInRight  { from { opacity: 0; transform: translateX(20px); } }
+
+  .week-title { transition: transform .3s cubic-bezier(.22,1,.36,1), opacity .3s ease; }
+  .week-title.pop { animation: titlePop .36s cubic-bezier(.22,1,.36,1); }
+  @keyframes titlePop { 0% { transform: scale(1.08); opacity: .55; } 100% { transform: scale(1); opacity: 1; } }
+
+  @keyframes todayPulse { 0%,100% { background: #dbeafe; } 50% { background: #bfdbfe; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .01ms !important;
+      animation-delay: 0ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: .01ms !important;
+    }
   }
