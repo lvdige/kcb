@@ -36,6 +36,8 @@ function getCurrentWeek() {
 }
 
 let currentWeek = 1;
+// 动画锁：视图切换 / 周切换动画进行中时忽略新请求，避免快速点击导致动画打架
+let viewLock = false;
 
 // ===== 渲染周选择页 =====
 function renderWeekGrid() {
@@ -49,7 +51,7 @@ function renderWeekGrid() {
     const isCur = w === cur;
     const tag = WEEK_TAGS[w] ? `<span class="week-tag">${WEEK_TAGS[w]}</span>` : "";
     html += `
-      <div class="week-btn ${isCur ? 'current' : ''}" onclick="selectWeek(${w})">
+      <div class="week-btn ${isCur ? 'current' : ''}" style="--i:${w - 1}" onclick="selectWeek(${w})">
         <div class="week-num">第 ${w} 周</div>
         <div class="week-date">${formatDate(mon)} - ${formatDate(sun)}</div>
         ${tag}
@@ -59,8 +61,11 @@ function renderWeekGrid() {
 }
 
 // ===== 渲染课程表 =====
-function renderSchedule(weekNum) {
+// dir：0 = 首次进入（课程块交错入场）；1 / -1 = 上一周 / 下一周切换（表格整体滑动）
+function renderSchedule(weekNum, dir) {
   currentWeek = weekNum;
+  const table = document.getElementById("scheduleTable");
+  table.dataset.dir = String(dir || 0);
   const mon = getWeekMonday(weekNum);
   const sun = new Date(mon);
   sun.setDate(sun.getDate() + 6);
@@ -92,7 +97,7 @@ function renderSchedule(weekNum) {
 
   // 表体
   let bodyHtml = "";
-  PERIODS.forEach(p => {
+  PERIODS.forEach((p, idx) => {
     bodyHtml += `<tr><td class="period-col"><div class="period-label">第${p.num}节</div><div class="period-time">${p.time}</div></td>`;
     for (let d = 1; d <= 5; d++) {
       const ev = cellMap[`${d}_${p.num}`];
@@ -101,7 +106,7 @@ function renderSchedule(weekNum) {
         if (ev.startSec === p.num) {
           const rowSpan = ev.endSec - ev.startSec + 1;
           bodyHtml += `<td class="course-cell" rowspan="${rowSpan}">
-            <div class="course-block ${getColor(ev.summary)}" onclick='showModal(${JSON.stringify(ev).replace(/'/g, "&#39;")})'>
+            <div class="course-block ${getColor(ev.summary)}" style="--i:${Math.min(idx, 10)}" onclick='showModal(${JSON.stringify(ev).replace(/'/g, "&#39;")})'>
               <div class="course-name">${ev.summary}</div>
               ${ev.location ? `<div class="course-loc">📍 ${ev.location}</div>` : ''}
               ${ev.teacher ? `<div class="course-teacher">👨‍🏫 ${ev.teacher}</div>` : ''}
@@ -118,22 +123,59 @@ function renderSchedule(weekNum) {
   document.getElementById("scheduleBody").innerHTML = bodyHtml;
 }
 
-// ===== 视图切换 =====
+// ===== 视图切换（带动画） =====
+function switchView(hideId, showId, afterShow) {
+  if (viewLock) return;
+  viewLock = true;
+  const hide = document.getElementById(hideId);
+  const show = document.getElementById(showId);
+  hide.classList.add("view-exit");
+  setTimeout(() => {
+    hide.classList.remove("view-exit");
+    hide.style.display = "none";
+    show.style.display = "block";
+    // 重新触发入场动画
+    show.classList.remove("view-enter");
+    void show.offsetWidth;
+    show.classList.add("view-enter");
+    if (afterShow) afterShow();
+    viewLock = false;
+  }, 170);
+}
 function showWeekSelect() {
-  document.getElementById("weekSelectView").style.display = "block";
-  document.getElementById("scheduleView").style.display = "none";
+  switchView("scheduleView", "weekSelectView");
 }
 function selectWeek(w) {
-  document.getElementById("weekSelectView").style.display = "none";
-  document.getElementById("scheduleView").style.display = "block";
-  renderSchedule(w);
-}
-function changeWeek(delta) {
-  const w = currentWeek + delta;
-  if (w >= 1 && w <= TOTAL_WEEKS) renderSchedule(w);
+  switchView("weekSelectView", "scheduleView", () => renderSchedule(w, 0));
 }
 
-// ===== 弹窗 =====
+// ===== 周切换（带动画） =====
+function changeWeek(delta) {
+  const w = currentWeek + delta;
+  if (w < 1 || w > TOTAL_WEEKS || viewLock) return;
+  viewLock = true;
+  const table = document.getElementById("scheduleTable");
+  const title = document.getElementById("weekTitle");
+  // 周标题轻微弹跳
+  title.classList.remove("pop");
+  void title.offsetWidth;
+  title.classList.add("pop");
+  // 旧表格滑出
+  table.classList.add(delta > 0 ? "anim-out-left" : "anim-out-right");
+  setTimeout(() => {
+    renderSchedule(w, delta);
+    table.classList.remove("anim-out-left", "anim-out-right");
+    void table.offsetWidth;
+    // 新表格从对应方向滑入
+    table.classList.add(delta > 0 ? "anim-in-right" : "anim-in-left");
+    setTimeout(() => {
+      table.classList.remove("anim-in-right", "anim-in-left");
+      viewLock = false;
+    }, 460);
+  }, 190);
+}
+
+// ===== 弹窗（带动画） =====
 // 根据节次号取该节时间字符串（如 "08:40~9:20"）
 function getPeriodTime(secNum) {
   const p = PERIODS.find(p => p.num === secNum);
@@ -150,16 +192,31 @@ function showModal(ev) {
     <p><strong>教室：</strong>${ev.location || "待定"}</p>
     <p><strong>老师：</strong>${ev.teacher}</p>
   `;
-  document.getElementById("modalMask").classList.add("show");
+  // 顶部色条与课程块同色
+  document.getElementById("modalBar").className = "modal-bar " + getColor(ev.summary);
+  const mask = document.getElementById("modalMask");
+  mask.classList.remove("show", "visible");
+  void mask.offsetWidth;
+  mask.classList.add("show");
+  // 下一帧再加 visible，保证 display 切换后过渡动画正常播放
+  requestAnimationFrame(() => mask.classList.add("visible"));
 }
 function closeModal(e) {
-  if (e && e.target.id !== "modalMask" && e.type === "click" && e.currentTarget.id !== "modalMask") {
-    // 点击modal内部不关闭
-  }
-  document.getElementById("modalMask").classList.remove("show");
+  // 点击弹窗内容区不关闭，只有点遮罩或关闭按钮才关
+  if (e && e.target && e.target.id !== "modalMask") return;
+  const mask = document.getElementById("modalMask");
+  if (!mask.classList.contains("show")) return;
+  mask.classList.remove("visible");
+  setTimeout(() => mask.classList.remove("show"), 250);
 }
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeModal();
+});
 
 // ===== 初始化 =====
 renderWeekGrid();
+// 首页入场动画
+const weekSelect = document.getElementById("weekSelectView");
+weekSelect.classList.add("view-enter");
 // 默认定位到当前周
 // selectWeek(getCurrentWeek()); // 默认先显示周选择页
