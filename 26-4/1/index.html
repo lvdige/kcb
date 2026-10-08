@@ -387,7 +387,7 @@ function renderSchedule(weekNum) {
   document.getElementById("nextWeek").disabled = weekNum >= TOTAL_WEEKS;
 
   // 表头
-  const dayNames = ["周一","周二","周三","周四","周五","周六","周日"];
+  const dayNames = ["周一","周二","周三","周四","周五"];
   const today = new Date();
   let headerHtml = '<th class="period-col">节次</th>';
   for (let d = 0; d < 5; d++) {
