@@ -390,7 +390,7 @@ function renderSchedule(weekNum) {
   const dayNames = ["周一","周二","周三","周四","周五","周六","周日"];
   const today = new Date();
   let headerHtml = '<th class="period-col">节次</th>';
-  for (let d = 0; d < 7; d++) {
+  for (let d = 0; d < 5; d++) {
     const dayDate = new Date(mon);
     dayDate.setDate(dayDate.getDate() + d);
     const isToday = today.toDateString() === dayDate.toDateString();
@@ -412,7 +412,7 @@ function renderSchedule(weekNum) {
   let bodyHtml = "";
   PERIODS.forEach(p => {
     bodyHtml += `<tr><td class="period-col"><div class="period-label">第${p.num}节</div><div class="period-time">${p.time}</div></td>`;
-    for (let d = 1; d <= 7; d++) {
+    for (let d = 1; d <= 5; d++) {
       const ev = cellMap[`${d}_${p.num}`];
       if (ev) {
         // 只在课程开始节次渲染block
@@ -458,7 +458,6 @@ function showModal(ev) {
     <p><strong>节次：</strong>第${ev.startSec} - ${ev.endSec}节</p>
     <p><strong>教室：</strong>${ev.location || "待定"}</p>
     <p><strong>老师：</strong>${ev.teacher}</p>
-    <p><strong>时间：</strong>${ev.firstDate} 至 ${ev.lastDate}</p>
   `;
   document.getElementById("modalMask").classList.add("show");
 }
