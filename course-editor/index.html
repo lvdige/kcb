@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课表配置编辑器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="lib/xlsx.full.min.js"></script>
+<script src="lib/exceljs.min.js"></script>
+</head>
+<body>
+  <div class="bg-blob b1"></div>
+  <div class="bg-blob b2"></div>
+  <div class="bg-blob b3"></div>
+
+  <div class="page">
+    <header class="hero">
+      <div class="hero-badge">⚡ 课表配置工作台</div>
+      <h1>课表配置编辑器</h1>
+      <p>可视化编辑课表 · Excel 批量导入导出 · 一键生成 <code>js/config.js</code></p>
+    </header>
+
+    <div class="intro card-anim" style="--delay:0ms">
+      <strong>使用说明：</strong>
+      ① 直接在网页里改各项配置；② 或点「导出 Excel」下载表格，在 Excel 里批量填好后点「导入 Excel」回传；
+      ③ 全部改完点「导出 config.js」下载文件，覆盖到课表网站的 <code>js/config.js</code> 即可生效。
+      日期支持 <code>2026-09-07</code> / <code>2026.9.7</code> / <code>2026年9月7日</code> / <code>20260907</code>；
+      时间支持 <code>8:40</code> / <code>08:40</code> / <code>8：40</code> / <code>8点40分</code>。
+    </div>
+
+    <div class="toolbar-top card-anim" style="--delay:60ms">
+      <button class="btn-excel" onclick="exportExcel()">📊 导出当前为 Excel</button>
+      <button class="btn-excel-ghost" onclick="exportTemplate()">📋 导出空白模板</button>
+      <button class="btn-excel-ghost" onclick="document.getElementById('fileInput').click()">📥 导入 Excel</button>
+      <button class="btn-ghost" onclick="document.getElementById('jsFileInput').click()">📄 导入 config.js</button>
+      <button class="btn-export" onclick="exportPrettyTimetable()">🎨 导出精美课表</button>
+      <button class="btn-export" onclick="exportConfig()">⬇ 导出 config.js</button>
+      <button class="btn-ghost" onclick="copyConfig()">复制 config.js</button>
+      <input type="file" id="fileInput" accept=".xlsx,.csv" hidden onchange="importExcel(this)">
+      <input type="file" id="jsFileInput" accept=".js" hidden onchange="importConfigJs(this)">
+    </div>
+
+    <main class="grid">
+      <section class="card card-anim" style="--delay:120ms">
+        <h2><span class="dot blue"></span>学期设置</h2>
+        <p class="hint">开学日必须是周一；总周数决定排课范围。</p>
+        <div class="form-row">
+          <div class="field">
+            <label>开学日</label>
+            <input id="startDate" type="date">
+          </div>
+          <div class="field">
+            <label>总周数</label>
+            <input id="totalWeeks" type="number" min="1" placeholder="例：20">
+          </div>
+        </div>
+      </section>
+
+      <section class="card card-anim" style="--delay:180ms">
+        <h2><span class="dot green"></span>显示哪几天</h2>
+        <p class="hint">勾选的星期几才会在课表上显示。</p>
+        <div class="chips" id="showDaysBox"></div>
+      </section>
+
+      <section class="card card-anim" style="--delay:240ms">
+        <h2><span class="dot orange"></span>节次时间</h2>
+        <p class="hint">每节课的开始/结束时间，系统据此高亮"正在上的课"。</p>
+        <div id="periodsBox"></div>
+        <button class="btn-add" onclick="addPeriod()">+ 加一节</button>
+      </section>
+
+      <section class="card card-anim" style="--delay:300ms">
+        <h2><span class="dot purple"></span>特殊周标签</h2>
+        <p class="hint">在周选择页给某周加个小标签，如实训周。</p>
+        <div id="weekTagsBox"></div>
+        <button class="btn-add" onclick="addWeekTag()">+ 加标签</button>
+      </section>
+
+      <section class="card card-anim" style="--delay:360ms">
+        <h2><span class="dot pink"></span>调休安排</h2>
+        <p class="hint">原日期→调休日期，过期自动隐藏。</p>
+        <div id="makeupBox"></div>
+        <button class="btn-add" onclick="addMakeup()">+ 加调休</button>
+      </section>
+
+      <section class="card card-anim card-wide" style="--delay:420ms">
+        <h2>
+          <span class="dot indigo"></span>课程列表
+          <span class="count-badge" id="courseCount">0</span>
+        </h2>
+        <p class="hint">同一门课多个时段就加多行时段；教室可留空。</p>
+        <div class="table-wrap">
+          <table class="course-table" id="coursesTable">
+            <thead>
+              <tr>
+                <th>课程名</th><th>学分</th><th>老师</th><th>备注</th>
+                <th>时段明细（周几 / 节次 / 周区间 / 教室）</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="coursesBox"></tbody>
+          </table>
+        </div>
+        <button class="btn-add" onclick="addCourse()">+ 加课程</button>
+      </section>
+    </main>
+
+    <section class="card card-anim" style="--delay:480ms">
+      <h2><span class="dot slate"></span>导出预览</h2>
+      <p class="hint">下方是生成的 config.js 全文，可直接复制使用。</p>
+      <textarea id="output" readonly spellcheck="false"></textarea>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script>
+    // 防止误触刷新：离开页面前弹确认
+    window.addEventListener("beforeunload", e => {
+      e.preventDefault();
+      e.returnValue = "配置可能未保存，确定要离开吗？";
+      return e.returnValue;
+    });
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>
