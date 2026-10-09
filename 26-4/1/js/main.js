@@ -565,7 +565,18 @@ if (isMobile) {
           backPressedOnce = false
         }, 2000)
       } else {
+        // 第二次按返回：尝试关闭标签页
         window.close()
+        // 兜底：部分浏览器禁止脚本关闭非脚本打开的标签页，延迟检测
+        // 如果标签没关掉，就把历史回退到底（等效于退出）
+        setTimeout(() => {
+          if (!window.closed) {
+            window.open('', '_self')
+            window.close()
+            // 再兜底：跳回上一页（用户感知为退出网页）
+            history.go(-history.length)
+          }
+        }, 200)
       }
     }
   })
