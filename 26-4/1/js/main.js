@@ -105,9 +105,11 @@ function renderSchedule(weekNum, dir) {
         // 只在课程开始节次渲染block
         if (ev.startSec === p.num) {
           const rowSpan = ev.endSec - ev.startSec + 1;
+          const credit = CREDITS[ev.summary];
           bodyHtml += `<td class="course-cell" rowspan="${rowSpan}">
             <div class="course-block ${getColor(ev.summary)}" style="--i:${Math.min(idx, 10)}" onclick='showModal(${JSON.stringify(ev).replace(/'/g, "&#39;")})'>
               <div class="course-name">${ev.summary}</div>
+              ${credit !== undefined ? `<div class="course-credit">🎓 ${credit}学分</div>` : ''}
               ${ev.location ? `<div class="course-loc">📍 ${ev.location}</div>` : ''}
               ${ev.teacher ? `<div class="course-teacher">👨‍🏫 ${ev.teacher}</div>` : ''}
             </div>
@@ -186,7 +188,9 @@ function showModal(ev) {
   const startTime = getPeriodTime(ev.startSec).split("~")[0];
   const endTime = getPeriodTime(ev.endSec).split("~")[1];
   document.getElementById("modalTitle").textContent = ev.summary;
+  const credit = CREDITS[ev.summary];
   document.getElementById("modalInfo").innerHTML = `
+    <p><strong>学分：</strong>${credit !== undefined ? credit + " 学分" : "—"}</p>
     <p><strong>时间：</strong>${startTime}~${endTime}</p>
     <p><strong>节次：</strong>第${ev.startSec} - ${ev.endSec}节</p>
     <p><strong>教室：</strong>${ev.location || "待定"}</p>
