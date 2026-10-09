@@ -154,6 +154,16 @@
   }
   .course-block:active { transform: scale(.97); }
   .course-name { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
+  .course-credit {
+    display: inline-block;
+    font-size: 10px;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+    margin-bottom: 3px;
+  }
   .course-loc { font-size: 11px; opacity: 0.9; }
   .course-teacher { font-size: 10px; opacity: 0.8; margin-top: 2px; }
   .empty-cell { background: #fcfdfe; }
@@ -263,6 +273,7 @@
     .course-cell { height: 56px; padding: 4px !important; }
     .course-block { padding: 6px 4px; border-radius: 6px; }
     .course-name { font-size: 12px; margin-bottom: 2px; }
+    .course-credit { font-size: 9px; padding: 1px 5px; margin-bottom: 2px; }
     .course-loc { font-size: 10px; }
     .course-teacher { font-size: 9px; margin-top: 1px; }
 
