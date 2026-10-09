@@ -127,6 +127,7 @@ const COURSES = [
     name: '体育（一）',
     credit: 1,
     teacher: '',
+    note: '健身气功',
     sessions: [
       {
         day: 1,
@@ -134,7 +135,7 @@ const COURSES = [
         endSec: 8,
         startWeek: 5,
         endWeek: 14,
-        location: ''
+        location: '学校田径场'
       }
     ]
   },

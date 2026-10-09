@@ -219,6 +219,7 @@ function renderSchedule (weekNum, dir) {
                   ? `<div class="course-teacher">${ICONS.teacher}${ev.teacher}</div>`
                   : ''
               }
+              ${ev.note ? `<div class="course-note">${ev.note}</div>` : ''}
             </div>
           </td>`
         }
@@ -336,6 +337,7 @@ function showModal (ev) {
     <p><strong>时间：</strong>${startTime}~${endTime}</p>
     <p><strong>教室：</strong>${ev.location || '待定'}</p>
     <p><strong>老师：</strong>${ev.teacher}</p>
+    ${ev.note ? `<p><strong>备注：</strong>${ev.note}</p>` : ''}
   `
   // 顶部色条与课程块同色
   document.getElementById('modalBar').className =
@@ -482,17 +484,20 @@ function renderMakeup () {
           <div class="course-name">${ev.summary}</div>
           ${
             credit !== undefined
-              ? `<div class="course-credit">🎓 ${credit}学分</div>`
+              ? `<div class="course-credit">${ICONS.credit}${credit}学分</div>`
               : ''
           }
           ${
-            ev.location ? `<div class="course-loc">📍 ${ev.location}</div>` : ''
+            ev.location
+              ? `<div class="course-loc">${ICONS.pin}${ev.location}</div>`
+              : ''
           }
           ${
             ev.teacher
-              ? `<div class="course-teacher">👨‍🏫 ${ev.teacher}</div>`
+              ? `<div class="course-teacher">${ICONS.teacher}${ev.teacher}</div>`
               : ''
           }
+          ${ev.note ? `<div class="course-note">${ev.note}</div>` : ''}
         </div>
       </td>`
     } else if (!ev) {
