@@ -126,7 +126,7 @@ const COURSES = [
   {
     name: '体育（一）',
     credit: 1,
-    teacher: '',
+    teacher: '尹利清',
     note: '健身气功',
     sessions: [
       {
