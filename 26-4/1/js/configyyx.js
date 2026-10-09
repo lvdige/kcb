@@ -432,7 +432,7 @@ const COURSES = [
 // 例子：
 //   { originalDate: "2026-10-07", makeupDate: "2026-10-10", note: "国庆调休" },
 const MAKEUP_CLASSES = [
-  // { originalDate: "2026-10-07", makeupDate: "2026-10-10", note: "国庆调休" },
+  { originalDate: "2026-10-07", makeupDate: "2026-10-10", note: "国庆调休" },
 ]
 
 // ============================================================
