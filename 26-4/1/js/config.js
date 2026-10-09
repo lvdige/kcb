@@ -129,7 +129,7 @@ const COURSES = [
 ];
 
 const MAKEUP_CLASSES = [
-  { originalDate: '2026-10-07', makeupDate: '2026-10-10', note: '' },
+  { originalDate: '2026-10-07', makeupDate: '2026-10-10', note: '国庆调休' },
 ];
 
 // ===== 运行时拍平（不要改）=====
