@@ -1,6 +1,12 @@
 // ============================================================
 // main.js — 课表页面主逻辑
 // ============================================================
+
+// 从配置读网站标题
+document.getElementById("pageTitle").textContent = SITE.title;
+document.getElementById("heroTitle").textContent = SITE.heroTitle;
+document.getElementById("heroSubtitle").textContent = SITE.heroSubtitle;
+
 // 这个文件负责：
 //   1. 课程配色分配
 //   2. 周选择页渲染

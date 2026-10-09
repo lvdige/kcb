@@ -2,6 +2,12 @@
 // 课程表总配置文件（由编辑器生成）
 // ============================================================
 
+const SITE = {
+  title: '计应26-4班课程表',
+  heroTitle: '计应26-4班课程表',
+  heroSubtitle: '2026–2027 学年第一学期 · 2026年9月7日开学 · 大一上'
+};
+
 const SEMESTER = {
   startDate: '2026-09-07',
   totalWeeks: 20
@@ -129,7 +135,7 @@ const COURSES = [
 ];
 
 const MAKEUP_CLASSES = [
-  { originalDate: '2026-10-07', makeupDate: '2026-10-10', note: '国庆调休' },
+  { originalDate: '2026-10-07', makeupDate: '2026-10-10', note: '' },
 ];
 
 // ===== 运行时拍平（不要改）=====
