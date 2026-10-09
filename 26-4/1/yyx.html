@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>计应26-4班课程表</title>
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Crect x='14' y='14' width='36' height='36' rx='4' fill='none' stroke='white' stroke-width='3'/%3E%3Cline x1='14' y1='26' x2='50' y2='26' stroke='white' stroke-width='3'/%3E%3Cline x1='14' y1='38' x2='50' y2='38' stroke='white' stroke-width='3'/%3E%3Cline x1='26' y1='14' x2='26' y2='50' stroke='white' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- 周选择视图 -->
+    <div class="week-select-view" id="weekSelectView">
+      <div class="header">
+        <h1>计应26-4班课程表</h1>
+        <p>2026–2027 学年第一学期 · 2026年9月7日开学 · 大一上</p>
+      </div>
+      <div class="makeup-entry-bar">
+        <button class="makeup-entry-btn" onclick="showMakeupView()">调休课表</button>
+      </div>
+      <div class="week-grid" id="weekGrid"></div>
+    </div>
+
+    <!-- 课程表视图 -->
+    <div class="schedule-view" id="scheduleView">
+      <div class="top-bar">
+        <button class="back-btn" onclick="showWeekSelect()">← 返回周选择</button>
+        <div class="week-nav">
+          <button class="nav-btn" id="prevWeek" onclick="changeWeek(-1)">上一周</button>
+          <div class="week-title" id="weekTitle"></div>
+          <button class="nav-btn" id="nextWeek" onclick="changeWeek(1)">下一周</button>
+        </div>
+        <div style="width:120px"></div>
+      </div>
+      <div class="schedule-scroll">
+        <table class="schedule" id="scheduleTable">
+          <thead>
+            <tr id="dayHeader"></tr>
+          </thead>
+          <tbody id="scheduleBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 调休课表视图 -->
+    <div class="makeup-view" id="makeupView" style="display:none">
+      <div class="top-bar">
+        <button class="back-btn" onclick="showWeekSelectFromMakeup()">← 返回周选择</button>
+        <div class="week-nav">
+          <div class="week-title">调休课表</div>
+        </div>
+        <div style="width:120px"></div>
+      </div>
+      <div class="makeup-tabs" id="makeupTabs"></div>
+      <div class="makeup-empty" id="makeupEmpty" style="display:none">
+        <div class="makeup-empty-icon">
+          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#3b82f6" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+            <path d="M9 16l2 2 4-4" />
+          </svg>
+        </div>
+        <p>近期暂无调休安排</p>
+      </div>
+      <div class="schedule-scroll" id="makeupScroll">
+        <table class="schedule" id="makeupTable">
+          <thead>
+            <tr id="makeupHeader"></tr>
+          </thead>
+          <tbody id="makeupBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 课程详情弹窗 -->
+  <div class="modal-mask" id="modalMask" onclick="closeModal(event)">
+    <div class="modal">
+      <div class="modal-bar" id="modalBar"></div>
+      <h3 id="modalTitle"></h3>
+      <p id="modalInfo"></p>
+      <button class="close-btn" onclick="closeModal()">关闭</button>
+    </div>
+  </div>
+
+  <!-- 底部轻提示（toast） -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/configyyx.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>
