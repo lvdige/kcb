@@ -455,6 +455,15 @@ table.schedule[data-dir="-1"] .course-block {
   margin-top: 2px;
 }
 
+.course-note {
+  font-size: 10px;
+  opacity: 0.75;
+  margin-top: 3px;
+  padding: 1px 6px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+}
+
 .empty-cell {
   background: #fcfdfe;
 }
