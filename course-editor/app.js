@@ -551,9 +551,6 @@ async function exportPrettyTimetable() {
     for (let pIdx = 0; pIdx < nPeriod; pIdx++) {
       const p = cfg.periods[pIdx];
       for (let d = 1; d <= nDay; d++) {
-        // 判断这天是否放假（originalDate），放假就跳过
-        const thatDate = new Date(monday.getTime() + (d-1)*86400000);
-        if (holidayDates.has(iso(thatDate))) continue;
         for (const c of cfg.courses) {
           for (const s of c.sessions) {
             if (s.day === d && w >= s.startWeek && w <= s.endWeek && p.num === s.startSec) {
@@ -767,22 +764,19 @@ async function exportPrettyTimetable() {
       const d = new Date(start.getTime() + i*86400000);
       const w = Math.floor(i / 7) + 1;
       const day = dow(d);
-      // 放假日不填常规课
-      if (!holidayDates.has(iso(d))) {
-        for (const c of cfg.courses) {
-          for (const s of c.sessions) {
-            if (s.day === day && w >= s.startWeek && w <= s.endWeek) {
-              const startRow = 3 + s.startSec;
-              const endRow = 3 + s.endSec;
-              const col = 3 + i;
-              if (endRow > startRow) ws.mergeCells(startRow, col, endRow, col);
-              const cell = ws.getCell(startRow, col);
-              cell.value = `${c.name}\n${c.teacher||""}\n📍${s.location||""}`;
-              cell.font = { name:"Microsoft YaHei", size:9, color:{argb:"FF1E293B"} };
-              cell.alignment = { horizontal:"center", vertical:"middle", wrapText:true };
-              cell.fill = { type:"pattern", pattern:"solid", fgColor:{ argb: colorFor(c.name) } };
-              cell.border = allBorder;
-            }
+      for (const c of cfg.courses) {
+        for (const s of c.sessions) {
+          if (s.day === day && w >= s.startWeek && w <= s.endWeek) {
+            const startRow = 3 + s.startSec;
+            const endRow = 3 + s.endSec;
+            const col = 3 + i;
+            if (endRow > startRow) ws.mergeCells(startRow, col, endRow, col);
+            const cell = ws.getCell(startRow, col);
+            cell.value = `${c.name}\n${c.teacher||""}\n📍${s.location||""}`;
+            cell.font = { name:"Microsoft YaHei", size:9, color:{argb:"FF1E293B"} };
+            cell.alignment = { horizontal:"center", vertical:"middle", wrapText:true };
+            cell.fill = { type:"pattern", pattern:"solid", fgColor:{ argb: colorFor(c.name) } };
+            cell.border = allBorder;
           }
         }
       }
