@@ -1,324 +1,976 @@
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: url("../img/bg.jpg") center/cover no-repeat fixed,
+    linear-gradient(135deg, #e0f2fe 0%, #dbeafe 50%, #e0e7ff 100%);
+  min-height: 100vh;
+  color: #1e293b;
+}
+
+@media (max-width: 768px) {
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 50%, #e0e7ff 100%);
-    min-height: 100vh;
-    color: #1e293b;
+    background: url("../img/bg-mobile.jpg") center/cover no-repeat scroll,
+      linear-gradient(135deg, #e0f2fe 0%, #dbeafe 50%, #e0e7ff 100%);
   }
-  .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+}
 
-  /* ===== 周选择页面 ===== */
-  .week-select-view { padding: 20px 0; }
-  .header {
-    text-align: center;
-    margin-bottom: 30px;
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ===== 周选择页面 ===== */
+.week-select-view {
+  padding: 20px 0;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.header h1 {
+  font-size: 28px;
+  background: linear-gradient(135deg, #1e40af, #6366f1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.header p {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.week-btn {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid rgba(226, 232, 240, 0.8);
+  border-radius: 14px;
+  padding: 14px 12px;
+  min-height: 118px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .28s cubic-bezier(.22, 1, .36, 1), box-shadow .28s ease, border-color .25s ease;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  animation: btnIn .5s cubic-bezier(.22, 1, .36, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 30ms);
+}
+
+.week-btn:hover {
+  border-color: #3b82f6;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.15);
+}
+
+.week-btn:active {
+  transform: translateY(-1px) scale(.97);
+}
+
+.week-btn.current {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+}
+
+.week-btn.current .week-date {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.week-num {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.week-date {
+  font-size: 12px;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.week-tag {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.week-btn.current .week-tag {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+/* ===== 调休课表入口按钮 ===== */
+.makeup-entry-bar {
+  display: flex;
+  justify-content: center;
+  margin: -10px 0 22px;
+}
+
+.makeup-entry-btn {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid #3b82f6;
+  color: #1e40af;
+  border-radius: 12px;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.18);
+  transition: transform .25s cubic-bezier(.22, 1, .36, 1), box-shadow .25s ease, background .25s ease;
+}
+
+.makeup-entry-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.28);
+  background: #eff6ff;
+}
+
+.makeup-entry-btn:active {
+  transform: scale(.97);
+}
+
+/* ===== 调休课表视图 ===== */
+.makeup-view {
+  padding: 20px 0;
+}
+
+.makeup-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 14px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.makeup-tab {
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(203, 213, 225, 0.7);
+  color: #475569;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .2s ease;
+  white-space: nowrap;
+}
+
+.makeup-tab:hover {
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+.makeup-tab.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.makeup-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+}
+
+.makeup-empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.makeup-empty p {
+  font-size: 16px;
+}
+
+/* ===== 课程表页面 ===== */
+.schedule-view {
+  display: none;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(203, 213, 225, 0.7);
+  border-radius: 10px;
+  padding: 10px 18px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #334155;
+  transition: background .2s ease, border-color .2s ease, color .2s ease, transform .25s cubic-bezier(.22, 1, .36, 1);
+}
+
+.back-btn:hover {
+  background: #f1f5f9;
+  transform: translateX(-2px);
+}
+
+.back-btn:active {
+  transform: translateX(-1px) scale(.95);
+}
+
+.week-nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.nav-btn {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(203, 213, 225, 0.7);
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background .2s ease, border-color .2s ease, color .2s ease, transform .25s cubic-bezier(.22, 1, .36, 1);
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.nav-btn:active:not(:disabled) {
+  transform: scale(.94);
+}
+
+.nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.week-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e40af;
+  min-width: 140px;
+  text-align: center;
+}
+
+table.schedule {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+  table-layout: fixed;
+}
+
+table.schedule th,
+table.schedule td {
+  border: 1px solid #e2e8f0;
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+
+table.schedule thead th {
+  background: #f8fafc;
+  padding: 14px 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #475569;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+table.schedule thead th.today {
+  background: #dbeafe;
+  color: #1e40af;
+  animation: todayPulse 3.2s ease-in-out infinite;
+}
+
+/* 首列（节次）冻结：横向滚动时保持可见 */
+table.schedule th.period-col,
+table.schedule td.period-col {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+/* 左上角：表头+首列交汇，层级最高 */
+table.schedule thead th.period-col {
+  z-index: 3;
+}
+
+.period-col {
+  width: 72px;
+  background: #f8fafc;
+}
+
+.period-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.period-time {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+/* 当前正在上的节次：首列高亮 */
+td.period-col.now-period,
+th.period-col.now-period {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+td.period-col.now-period .period-label {
+  color: #fff;
+  font-weight: 700;
+}
+
+td.period-col.now-period .period-time {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+td.period-col.now-period .period-label::before {
+  content: "●";
+  color: #fde047;
+  margin-right: 3px;
+  font-size: 9px;
+  animation: nowPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes nowPulse {
+
+  0%,
+  100% {
+    opacity: 1;
   }
+
+  50% {
+    opacity: .3;
+  }
+}
+
+.course-cell {
+  height: 76px;
+  padding: 6px !important;
+}
+
+.course-block {
+  border-radius: 8px;
+  padding: 8px 6px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform .32s cubic-bezier(.22, 1, .36, 1), box-shadow .32s ease, filter .32s ease;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+  animation: blockIn .5s cubic-bezier(.22, 1, .36, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 32ms);
+}
+
+table.schedule[data-dir="1"] .course-block,
+table.schedule[data-dir="-1"] .course-block {
+  animation: none;
+}
+
+.course-block:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.22);
+  filter: brightness(1.06);
+}
+
+.course-block:active {
+  transform: scale(.97);
+}
+
+.course-name {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 3px;
+}
+
+.course-credit {
+  display: inline-block;
+  font-size: 10px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  margin-bottom: 3px;
+}
+
+.course-loc {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.course-teacher {
+  font-size: 10px;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.empty-cell {
+  background: #fcfdfe;
+}
+
+/* 课程配色 */
+.c-blue {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.c-green {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.c-orange {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.c-pink {
+  background: linear-gradient(135deg, #ec4899, #db2777);
+}
+
+.c-purple {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.c-cyan {
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
+}
+
+.c-red {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.c-indigo {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+}
+
+.c-teal {
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
+}
+
+.c-amber {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+}
+
+.c-rose {
+  background: linear-gradient(135deg, #f43f5e, #e11d48);
+}
+
+.c-violet {
+  background: linear-gradient(135deg, #a855f7, #9333ea);
+}
+
+.c-emerald {
+  background: linear-gradient(135deg, #34d399, #059669);
+}
+
+.c-sky {
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
+}
+
+.c-lime {
+  background: linear-gradient(135deg, #84cc16, #65a30d);
+}
+
+.c-fuchsia {
+  background: linear-gradient(135deg, #d946ef, #c026d3);
+}
+
+.c-slate {
+  background: linear-gradient(135deg, #64748b, #475569);
+}
+
+.c-grape {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+}
+
+.c-mint {
+  background: linear-gradient(135deg, #2dd4bf, #0f766e);
+}
+
+.c-peach {
+  background: linear-gradient(135deg, #fb923c, #f43f5e);
+}
+
+/* 弹窗 */
+.modal-mask {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity .24s ease;
+}
+
+.modal-mask.show {
+  display: flex;
+}
+
+.modal-mask.visible {
+  opacity: 1;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 360px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(18px) scale(.94);
+  transition: opacity .26s ease, transform .34s cubic-bezier(.22, 1, .36, 1);
+}
+
+.modal-mask.visible .modal {
+  opacity: 1;
+  transform: none;
+}
+
+.modal-bar {
+  height: 4px;
+  border-radius: 16px 16px 0 0;
+  margin: -24px -24px 18px;
+}
+
+.modal h3 {
+  margin-bottom: 12px;
+  color: #1e40af;
+}
+
+.modal p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #475569;
+}
+
+.modal .close-btn {
+  margin-top: 16px;
+  width: 100%;
+  padding: 10px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background .2s ease, transform .25s cubic-bezier(.22, 1, .36, 1);
+}
+
+.modal .close-btn:hover {
+  background: #2563eb;
+}
+
+.modal .close-btn:active {
+  transform: scale(.96);
+}
+
+/* 底部轻提示 toast */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 60px;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(15, 23, 42, 0.85);
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: 22px;
+  font-size: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+  z-index: 200;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
   .header h1 {
-    font-size: 28px;
-    color: #1e40af;
-    margin-bottom: 8px;
+    font-size: 22px;
   }
-  .header p { color: #64748b; font-size: 14px; }
-  .week-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 14px;
-  }
-  .week-btn {
-    background: #fff;
-    border: 2px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 18px 12px;
-    cursor: pointer;
-    transition: transform .28s cubic-bezier(.22,1,.36,1), box-shadow .28s ease, border-color .25s ease;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    animation: btnIn .5s cubic-bezier(.22,1,.36,1) backwards;
-    animation-delay: calc(var(--i, 0) * 30ms);
-  }
-  .week-btn:hover {
-    border-color: #3b82f6;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(59,130,246,0.15);
-  }
-  .week-btn:active { transform: translateY(-1px) scale(.97); }
-  .week-btn.current {
-    border-color: #3b82f6;
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: #fff;
-  }
-  .week-btn.current .week-date { color: rgba(255,255,255,0.85); }
-  .week-num { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
-  .week-date { font-size: 12px; color: #94a3b8; }
-  .week-tag {
-    display: inline-block;
-    margin-top: 8px;
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    background: #fef3c7;
-    color: #92400e;
-  }
-  .week-btn.current .week-tag { background: rgba(255,255,255,0.25); color: #fff; }
 
-  /* ===== 课程表页面 ===== */
-  .schedule-view { display: none; }
-  .top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+  .week-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 10px;
   }
-  .back-btn {
-    background: #fff;
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    padding: 10px 18px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #334155;
-    transition: background .2s ease, border-color .2s ease, color .2s ease, transform .25s cubic-bezier(.22,1,.36,1);
-  }
-  .back-btn:hover { background: #f1f5f9; transform: translateX(-2px); }
-  .back-btn:active { transform: translateX(-1px) scale(.95); }
-  .week-nav { display: flex; gap: 8px; align-items: center; }
-  .nav-btn {
-    background: #fff;
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background .2s ease, border-color .2s ease, color .2s ease, transform .25s cubic-bezier(.22,1,.36,1);
-  }
-  .nav-btn:hover:not(:disabled) { background: #eff6ff; border-color: #3b82f6; transform: translateY(-1px); }
-  .nav-btn:active:not(:disabled) { transform: scale(.94); }
-  .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .week-title { font-size: 18px; font-weight: 700; color: #1e40af; min-width: 140px; text-align: center; }
 
-  table.schedule {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    background: #fff;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  .week-btn {
+    padding: 12px 6px;
   }
-  table.schedule th, table.schedule td {
-    border: 1px solid #e2e8f0;
-    padding: 0;
-    text-align: center;
-    vertical-align: middle;
+
+  .week-num {
+    font-size: 16px;
   }
-  table.schedule thead th {
-    background: #f8fafc;
-    padding: 14px 6px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #475569;
+}
+
+/* ===== 移动端适配 ===== */
+.schedule-scroll {
+  width: 100%;
+  overflow: auto;
+  max-height: calc(100vh - 180px);
+  -webkit-overflow-scrolling: touch;
+  border-radius: 14px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 12px 8px;
   }
-  table.schedule thead th.today {
-    background: #dbeafe;
-    color: #1e40af;
-    animation: todayPulse 3.2s ease-in-out infinite;
+
+  .header {
+    margin-bottom: 16px;
   }
-  .period-col { width: 60px; background: #f8fafc; }
-  .period-label { font-size: 12px; color: #64748b; font-weight: 600; }
-  .period-time { font-size: 10px; color: #94a3b8; margin-top: 2px; }
-  .course-cell { height: 70px; padding: 6px !important; }
-  .course-block {
-    border-radius: 8px;
-    padding: 8px 6px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: transform .32s cubic-bezier(.22,1,.36,1), box-shadow .32s ease, filter .32s ease;
-    color: #fff;
-    font-size: 12px;
+
+  .header h1 {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+
+  .header p {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .week-grid {
+    gap: 8px;
+  }
+
+  .week-btn {
+    padding: 10px 4px;
+    border-radius: 10px;
+    min-height: 92px;
+  }
+
+  .week-num {
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .week-date {
+    font-size: 11px;
+    white-space: normal;
     line-height: 1.4;
-    animation: blockIn .5s cubic-bezier(.22,1,.36,1) backwards;
-    animation-delay: calc(var(--i, 0) * 32ms);
   }
-  table.schedule[data-dir="1"] .course-block,
-  table.schedule[data-dir="-1"] .course-block { animation: none; }
-  .course-block:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 10px 22px rgba(15,23,42,0.22);
-    filter: brightness(1.06);
-  }
-  .course-block:active { transform: scale(.97); }
-  .course-name { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
-  .course-credit {
-    display: inline-block;
+
+  .week-tag {
+    margin-top: 6px;
     font-size: 10px;
-    line-height: 1;
-    padding: 2px 6px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.22);
-    color: #fff;
-    margin-bottom: 3px;
+    padding: 1px 6px;
   }
-  .course-loc { font-size: 11px; opacity: 0.9; }
-  .course-teacher { font-size: 10px; opacity: 0.8; margin-top: 2px; }
-  .empty-cell { background: #fcfdfe; }
 
-  /* 课程配色 */
-  .c-blue   { background: linear-gradient(135deg,#3b82f6,#2563eb); }
-  .c-green  { background: linear-gradient(135deg,#10b981,#059669); }
-  .c-orange { background: linear-gradient(135deg,#f59e0b,#d97706); }
-  .c-pink   { background: linear-gradient(135deg,#ec4899,#db2777); }
-  .c-purple { background: linear-gradient(135deg,#8b5cf6,#7c3aed); }
-  .c-cyan   { background: linear-gradient(135deg,#06b6d4,#0891b2); }
-  .c-red    { background: linear-gradient(135deg,#ef4444,#dc2626); }
-  .c-indigo { background: linear-gradient(135deg,#6366f1,#4f46e5); }
-  .c-teal   { background: linear-gradient(135deg,#14b8a6,#0d9488); }
-  .c-amber  { background: linear-gradient(135deg,#f97316,#ea580c); }
+  .makeup-entry-bar {
+    margin: -6px 0 14px;
+  }
 
-  /* 弹窗 */
-  .modal-mask {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 100;
+  .makeup-entry-btn {
+    padding: 8px 20px;
+    font-size: 13px;
+  }
+
+  .makeup-tab {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .top-bar {
+    margin-bottom: 12px;
+    gap: 8px;
+  }
+
+  .back-btn {
+    width: 100%;
+    order: 1;
+    text-align: center;
+    padding: 9px 14px;
+    font-size: 13px;
+  }
+
+  .week-nav {
+    order: 2;
+    width: 100%;
     justify-content: center;
-    align-items: center;
-    opacity: 0;
-    transition: opacity .24s ease;
+    gap: 8px;
   }
-  .modal-mask.show { display: flex; }
-  .modal-mask.visible { opacity: 1; }
+
+  .week-title {
+    min-width: 90px;
+    font-size: 15px;
+  }
+
+  .nav-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .top-bar>div:last-child {
+    display: none;
+  }
+
+  /* 课程表：窄屏下保持可读列宽，横向滑动查看 */
+  table.schedule {
+    min-width: 600px;
+  }
+
+  table.schedule thead th {
+    padding: 10px 4px;
+    font-size: 12px;
+  }
+
+  .period-col {
+    width: 52px;
+  }
+
+  .period-label {
+    font-size: 11px;
+  }
+
+  .period-time {
+    font-size: 9px;
+  }
+
+  .course-cell {
+    height: 62px;
+    padding: 4px !important;
+  }
+
+  .course-block {
+    padding: 6px 4px;
+    border-radius: 6px;
+  }
+
+  .course-name {
+    font-size: 12px;
+    margin-bottom: 2px;
+  }
+
+  .course-credit {
+    font-size: 9px;
+    padding: 1px 5px;
+    margin-bottom: 2px;
+  }
+
+  .course-loc {
+    font-size: 10px;
+  }
+
+  .course-teacher {
+    font-size: 9px;
+    margin-top: 1px;
+  }
+
   .modal {
-    background: #fff;
-    border-radius: 16px;
-    padding: 24px;
-    max-width: 360px;
-    width: 90%;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    opacity: 0;
-    transform: translateY(18px) scale(.94);
-    transition: opacity .26s ease, transform .34s cubic-bezier(.22,1,.36,1);
+    padding: 18px;
+    max-width: 92%;
   }
-  .modal-mask.visible .modal { opacity: 1; transform: none; }
-  .modal-bar {
-    height: 4px;
-    border-radius: 16px 16px 0 0;
-    margin: -24px -24px 18px;
+
+  .modal h3 {
+    font-size: 17px;
   }
-  .modal h3 { margin-bottom: 12px; color: #1e40af; }
-  .modal p { margin: 6px 0; font-size: 14px; color: #475569; }
+
   .modal .close-btn {
-    margin-top: 16px;
-    width: 100%;
-    padding: 10px;
-    background: #3b82f6;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+    padding: 9px;
     font-size: 14px;
-    transition: background .2s ease, transform .25s cubic-bezier(.22,1,.36,1);
   }
-  .modal .close-btn:hover { background: #2563eb; }
-  .modal .close-btn:active { transform: scale(.96); }
+}
 
-  @media (max-width: 768px) {
-    .container { padding: 10px; }
-    .header h1 { font-size: 22px; }
-    .week-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
-    .week-btn { padding: 12px 6px; }
-    .week-num { font-size: 16px; }
-    .course-name { font-size: 11px; }
-    .course-loc, .course-teacher { font-size: 9px; }
-    .period-col { width: 40px; }
+@media (max-width: 360px) {
+  .week-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  /* ===== 移动端适配 ===== */
-  .schedule-scroll {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  .week-num {
+    font-size: 14px;
   }
 
-  @media (max-width: 768px) {
-    .container { padding: 12px 8px; }
-    .header { margin-bottom: 16px; }
-    .header h1 { font-size: 20px; margin-bottom: 6px; }
-    .header p { font-size: 13px; line-height: 1.5; }
+  .week-date {
+    font-size: 10px;
+  }
+}
 
-    .week-grid { gap: 8px; }
-    .week-btn { padding: 10px 4px; border-radius: 10px; }
-    .week-num { font-size: 15px; margin-bottom: 4px; }
-    .week-date { font-size: 12px; }
-    .week-tag { margin-top: 6px; font-size: 10px; padding: 1px 6px; }
+/* ===== 动画增强 ===== */
+:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
 
-    .top-bar { margin-bottom: 12px; gap: 8px; }
-    .back-btn { width: 100%; order: 1; text-align: center; padding: 9px 14px; font-size: 13px; }
-    .week-nav { order: 2; width: 100%; justify-content: center; gap: 8px; }
-    .week-title { min-width: 90px; font-size: 15px; }
-    .nav-btn { padding: 8px 14px; font-size: 13px; }
-    .top-bar > div:last-child { display: none; }
+.view-enter {
+  animation: viewIn .45s cubic-bezier(.22, 1, .36, 1);
+}
 
-    /* 课程表：窄屏下保持可读列宽，横向滑动查看 */
-    table.schedule { min-width: 560px; }
-    table.schedule thead th { padding: 10px 4px; font-size: 12px; }
-    .period-col { width: 44px; }
-    .period-label { font-size: 11px; }
-    .period-time { font-size: 9px; }
-    .course-cell { height: 56px; padding: 4px !important; }
-    .course-block { padding: 6px 4px; border-radius: 6px; }
-    .course-name { font-size: 12px; margin-bottom: 2px; }
-    .course-credit { font-size: 9px; padding: 1px 5px; margin-bottom: 2px; }
-    .course-loc { font-size: 10px; }
-    .course-teacher { font-size: 9px; margin-top: 1px; }
+.view-exit {
+  animation: viewExit .16s ease forwards;
+}
 
-    .modal { padding: 18px; max-width: 92%; }
-    .modal h3 { font-size: 17px; }
-    .modal .close-btn { padding: 9px; font-size: 14px; }
+@keyframes viewIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes viewExit {
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes btnIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(.96);
+  }
+}
+
+@keyframes blockIn {
+  from {
+    opacity: 0;
+    transform: scale(.86) translateY(8px);
+  }
+}
+
+table.schedule.anim-out-left {
+  animation: tableOutLeft .18s ease forwards;
+}
+
+table.schedule.anim-out-right {
+  animation: tableOutRight .18s ease forwards;
+}
+
+table.schedule.anim-in-left {
+  animation: tableInLeft .42s cubic-bezier(.22, 1, .36, 1);
+}
+
+table.schedule.anim-in-right {
+  animation: tableInRight .42s cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes tableOutLeft {
+  to {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+}
+
+@keyframes tableOutRight {
+  to {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+}
+
+@keyframes tableInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+@keyframes tableInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+}
+
+.week-title {
+  transition: transform .3s cubic-bezier(.22, 1, .36, 1), opacity .3s ease;
+}
+
+.week-title.pop {
+  animation: titlePop .36s cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes titlePop {
+  0% {
+    transform: scale(1.08);
+    opacity: .55;
   }
 
-  @media (max-width: 360px) {
-    .week-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .week-num { font-size: 14px; }
-    .week-date { font-size: 10px; }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes todayPulse {
+
+  0%,
+  100% {
+    background: #dbeafe;
   }
 
-  /* ===== 动画增强 ===== */
-  :focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
-
-  .view-enter { animation: viewIn .45s cubic-bezier(.22,1,.36,1); }
-  .view-exit  { animation: viewExit .16s ease forwards; }
-  @keyframes viewIn   { from { opacity: 0; transform: translateY(16px); } }
-  @keyframes viewExit { to   { opacity: 0; transform: translateY(-8px); } }
-
-  @keyframes btnIn    { from { opacity: 0; transform: translateY(14px) scale(.96); } }
-  @keyframes blockIn  { from { opacity: 0; transform: scale(.86) translateY(8px); } }
-
-  table.schedule.anim-out-left  { animation: tableOutLeft .18s ease forwards; }
-  table.schedule.anim-out-right { animation: tableOutRight .18s ease forwards; }
-  table.schedule.anim-in-left   { animation: tableInLeft .42s cubic-bezier(.22,1,.36,1); }
-  table.schedule.anim-in-right  { animation: tableInRight .42s cubic-bezier(.22,1,.36,1); }
-  @keyframes tableOutLeft  { to { opacity: 0; transform: translateX(-14px); } }
-  @keyframes tableOutRight { to { opacity: 0; transform: translateX(14px); } }
-  @keyframes tableInLeft   { from { opacity: 0; transform: translateX(-20px); } }
-  @keyframes tableInRight  { from { opacity: 0; transform: translateX(20px); } }
-
-  .week-title { transition: transform .3s cubic-bezier(.22,1,.36,1), opacity .3s ease; }
-  .week-title.pop { animation: titlePop .36s cubic-bezier(.22,1,.36,1); }
-  @keyframes titlePop { 0% { transform: scale(1.08); opacity: .55; } 100% { transform: scale(1); opacity: 1; } }
-
-  @keyframes todayPulse { 0%,100% { background: #dbeafe; } 50% { background: #bfdbfe; } }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: .01ms !important;
-      animation-delay: 0ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: .01ms !important;
-    }
+  50% {
+    background: #bfdbfe;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
