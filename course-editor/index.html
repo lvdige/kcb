@@ -44,7 +44,27 @@
     </div>
 
     <main class="grid">
-      <section class="card card-anim" style="--delay:120ms">
+      <section class="card card-anim card-wide" style="--delay:120ms">
+        <h2><span class="dot blue"></span>网站标题</h2>
+        <p class="hint">浏览器标签页标题、周选择页大标题和副标题。副标题自动拼装，不用手写整句。</p>
+        <div class="form-row">
+          <div class="field"><label>浏览器标签标题</label><input id="siteTitle" placeholder="例：计应26-4班课程表"></div>
+          <div class="field"><label>页面大标题</label><input id="siteHeroTitle" placeholder="例：计应26-4班课程表"></div>
+        </div>
+        <div class="form-row" style="margin-top:10px">
+          <div class="field" style="flex:0.6"><label>起始年份</label><input id="siteStartYear" type="number" placeholder="例：2026"></div>
+          <div class="field" style="flex:0.6"><label>学期</label>
+            <select id="siteTerm">
+              <option value="第一学期">第一学期</option>
+              <option value="第二学期">第二学期</option>
+            </select>
+          </div>
+          <div class="field"><label>补充文字（自己发挥，如"大一上"）</label><input id="siteExtra" placeholder="例：大一上"></div>
+        </div>
+        <p style="font-size:13px;color:#6366f1;margin-top:10px">预览：<span id="subtitlePreview"></span></p>
+      </section>
+
+      <section class="card card-anim" style="--delay:180ms">
         <h2><span class="dot blue"></span>学期设置</h2>
         <p class="hint">开学日必须是周一；总周数决定排课范围。</p>
         <div class="form-row">

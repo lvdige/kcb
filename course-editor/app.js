@@ -1,6 +1,7 @@
 // ===== 课表配置编辑器 =====
 
 let cfg = {
+  site: { title: "", heroTitle: "", startYear: new Date().getFullYear(), term: "第一学期", extra: "" },
   semester: { startDate: new Date().toISOString().slice(0,10), totalWeeks: 20 },
   periods: [],
   showDays: [1,2,3,4,5,6,7],
@@ -16,8 +17,13 @@ const DAY_NAMES = ["","周一","周二","周三","周四","周五","周六","周
 // 支持：2026-09-07 / 2026-9-7 / 2026.09.07 / 2026/9/7 / 2026年9月7日 / 20260907 / 202697 / Date 对象
 function parseDateSmart(v) {
   if (v == null || v === "") return "";
-  if (v instanceof Date) {
+  if (v instanceof Date && !isNaN(v)) {
     return v.getFullYear() + "-" + String(v.getMonth()+1).padStart(2,"0") + "-" + String(v.getDate()).padStart(2,"0");
+  }
+  // Excel 序列号数字（1900 起）
+  if (typeof v === "number" && isFinite(v) && v > 30000 && v < 60000) {
+    const d = new Date(Date.UTC(1899,11,30) + v*86400000);
+    return d.getUTCFullYear() + "-" + String(d.getUTCMonth()+1).padStart(2,"0") + "-" + String(d.getUTCDate()).padStart(2,"0");
   }
   let s = String(v).trim();
   // 去掉中文"年月日"，把 . / 年 月 日 统一成分隔
@@ -54,10 +60,34 @@ function num(v) {
   return isNaN(n) ? 0 : n;
 }
 
+function updateSubtitlePreview() {
+  document.getElementById("subtitlePreview").textContent = buildSubtitle();
+}
+
 // ---------- 渲染 ----------
+// 拼副标题：2026–2027 学年第一学期 · 2026年9月7日开学 · 大一上
+function buildSubtitle() {
+  const year = +document.getElementById("siteStartYear").value || new Date().getFullYear();
+  const term = document.getElementById("siteTerm").value;
+  const extra = document.getElementById("siteExtra").value.trim();
+  const sd = document.getElementById("startDate").value;
+  let datePart = "";
+  if (sd) {
+    const [y,m,d] = sd.split("-").map(Number);
+    datePart = `${y}年${m}月${d}日开学`;
+  }
+  return `${year}–${year+1} 学年${term}${datePart ? " · " + datePart : ""}${extra ? " · " + extra : ""}`;
+}
+
 function render() {
   document.getElementById("startDate").value = cfg.semester.startDate;
   document.getElementById("totalWeeks").value = cfg.semester.totalWeeks;
+  document.getElementById("siteTitle").value = cfg.site.title || "";
+  document.getElementById("siteHeroTitle").value = cfg.site.heroTitle || "";
+  document.getElementById("siteStartYear").value = cfg.site.startYear || new Date().getFullYear();
+  document.getElementById("siteTerm").value = cfg.site.term || "第一学期";
+  document.getElementById("siteExtra").value = cfg.site.extra || "";
+  updateSubtitlePreview();
 
   // 节次
   const pb = document.getElementById("periodsBox");
@@ -185,9 +215,22 @@ function q(s) { return "'" + String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")
 function genConfig() {
   cfg.semester.startDate = document.getElementById("startDate").value;
   cfg.semester.totalWeeks = +document.getElementById("totalWeeks").value;
+  cfg.site.title = document.getElementById("siteTitle").value;
+  cfg.site.heroTitle = document.getElementById("siteHeroTitle").value;
+  cfg.site.startYear = +document.getElementById("siteStartYear").value;
+  cfg.site.term = document.getElementById("siteTerm").value;
+  cfg.site.extra = document.getElementById("siteExtra").value;
+  const sub = buildSubtitle();
+
   return `// ============================================================
 // 课程表总配置文件（由编辑器生成）
 // ============================================================
+
+const SITE = {
+  title: ${q(cfg.site.title)},
+  heroTitle: ${q(cfg.site.heroTitle)},
+  heroSubtitle: ${q(sub)}
+};
 
 const SEMESTER = {
   startDate: ${q(cfg.semester.startDate)},
@@ -271,14 +314,17 @@ function exportExcel() {
   const wb = XLSX.utils.book_new();
 
   XLSX.utils.book_append_sheet(wb, buildSheet(
-    "【学期设置】改下面「值」列即可。开学日支持 2026-09-07 / 2026.9.7 / 2026年9月7日 / 20260907 多种写法。显示日用逗号分隔：1,2,3,4,5",
-    "例：开学日=2026-09-07，总周数=20，显示日=1,2,3,4,5",
+    "【学期设置】第一部分是网站标题：浏览器标签标题、页面大标题填班级名；起始年份填开学年（自动拼 2026–2027 学年）；学期选第一/第二；补充文字自己写（如大一上）；开学日支持 2026-09-07 / 2026.9.7 / 2026年9月7日 / 20260907；显示日用逗号分隔",
+    "例：浏览器标签标题=计应26-4班课程表，起始年份=2026，学期=第一学期，补充文字=大一上，开学日=2026-09-07，总周数=20，显示日=1,2,3,4,5",
     ["配置项", "值"],
-    [
-      ["开学日", cfg.semester.startDate],
-      ["总周数", cfg.semester.totalWeeks],
-      ["显示日(逗号分隔)", cfg.showDays.join(",")],
-    ]
+    [["浏览器标签标题", cfg.site.title||""],
+     ["页面大标题", cfg.site.heroTitle||""],
+     ["起始年份", cfg.site.startYear||new Date().getFullYear()],
+     ["学期", cfg.site.term||"第一学期"],
+     ["补充文字", cfg.site.extra||""],
+     ["开学日", cfg.semester.startDate],
+     ["总周数", cfg.semester.totalWeeks],
+     ["显示日(逗号分隔)", cfg.showDays.join(",")]],
   ), "学期设置");
 
   XLSX.utils.book_append_sheet(wb, buildSheet(
@@ -322,10 +368,15 @@ function exportTemplate() {
   const wb = XLSX.utils.book_new();
 
   XLSX.utils.book_append_sheet(wb, buildSheet(
-    "【学期设置】改下面「值」列即可。开学日支持 2026-09-07 / 2026.9.7 / 2026年9月7日 / 20260907 多种写法。显示日用逗号分隔：1,2,3,4,5",
-    "例：开学日=2026-09-07，总周数=20，显示日=1,2,3,4,5",
+    "【学期设置】第一部分是网站标题：浏览器标签标题、页面大标题填班级名；起始年份填开学年（自动拼 2026–2027 学年）；学期选第一/第二；补充文字自己写（如大一上）；开学日支持 2026-09-07 / 2026.9.7 / 2026年9月7日 / 20260907；显示日用逗号分隔",
+    "例：浏览器标签标题=计应26-4班课程表，起始年份=2026，学期=第一学期，补充文字=大一上，开学日=2026-09-07，总周数=20，显示日=1,2,3,4,5",
     ["配置项", "值"],
-    [["开学日","2026-09-07"],["总周数",20],["显示日(逗号分隔)","1,2,3,4,5"]]
+    [["浏览器标签标题","计应26-4班课程表"],
+     ["页面大标题","计应26-4班课程表"],
+     ["起始年份",2026],
+     ["学期","第一学期"],
+     ["补充文字","大一上"],
+     ["开学日","2026-09-07"],["总周数",20],["显示日(逗号分隔)","1,2,3,4,5"]],
   ), "学期设置");
 
   XLSX.utils.book_append_sheet(wb, buildSheet(
@@ -367,13 +418,18 @@ function importExcel(input) {
   const reader = new FileReader();
   reader.onload = e => {
     try {
-      const wb = XLSX.read(e.target.result, { type: "array" });
+      const wb = XLSX.read(e.target.result, { type: "array", cellDates: true });
 
       // 学期
       const semSheet = wb.Sheets["学期设置"];
       if (semSheet) {
         const rows = XLSX.utils.sheet_to_json(semSheet, { header: 1 }).slice(4); // 跳过说明+例子+空+表头
         rows.forEach(r => {
+          if (r[0] === "浏览器标签标题") cfg.site.title = String(r[1]||"");
+          if (r[0] === "页面大标题") cfg.site.heroTitle = String(r[1]||"");
+          if (r[0] === "起始年份") cfg.site.startYear = num(r[1]);
+          if (r[0] === "学期") cfg.site.term = String(r[1]);
+          if (r[0] === "补充文字") cfg.site.extra = String(r[1]||"");
           if (r[0] === "开学日") cfg.semester.startDate = parseDateSmart(r[1]);
           if (r[0] === "总周数") cfg.semester.totalWeeks = num(r[1]);
           if (r[0] === "显示日(逗号分隔)") cfg.showDays = String(r[1]).split(/[,，、\s]+/).map(Number).filter(Boolean);
@@ -435,8 +491,22 @@ function importConfigJs(input) {
   reader.onload = e => {
     try {
       const code = e.target.result;
-      const factory = new Function(code + `; return { SEMESTER, PERIODS, SHOW_DAYS, WEEK_TAGS, COURSES, MAKEUP_CLASSES };`);
+      const factory = new Function(code + `; return { SITE, SEMESTER, PERIODS, SHOW_DAYS, WEEK_TAGS, COURSES, MAKEUP_CLASSES };`);
       const d = factory();
+      cfg.site.title = d.SITE?.title || "";
+      cfg.site.heroTitle = d.SITE?.heroTitle || "";
+      // 从旧的 heroSubtitle 反推 startYear/term/extra
+      const sub = d.SITE?.heroSubtitle || "";
+      const m = sub.match(/(\d{4})–(\d{4})\s*学年(第[一二]学期)[\s·]*(\d{4})年(\d{1,2})月(\d{1,2})日开学[\s·]*(.*)/);
+      if (m) {
+        cfg.site.startYear = +m[1];
+        cfg.site.term = m[3];
+        cfg.site.extra = m[7] || "";
+      } else {
+        cfg.site.startYear = new Date().getFullYear();
+        cfg.site.term = "第一学期";
+        cfg.site.extra = sub;
+      }
       cfg.semester.startDate = d.SEMESTER.startDate;
       cfg.semester.totalWeeks = d.SEMESTER.totalWeeks;
       cfg.periods = d.PERIODS;
@@ -811,7 +881,7 @@ async function exportPrettyTimetable() {
   const blob = new Blob([buf], { type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "精美课表.xlsx";
+  a.download = (cfg.site.title || "精美课表") + ".xlsx";
   a.click();
   showToast("已导出精美课表");
 }
@@ -825,7 +895,10 @@ function showToast(t) {
   showToast._t = setTimeout(()=>el.classList.remove("show"), 2000);
 }
 
-document.getElementById("startDate").addEventListener("input", updateOutput);
+document.getElementById("startDate").addEventListener("input", () => { updateSubtitlePreview(); updateOutput(); });
 document.getElementById("totalWeeks").addEventListener("input", updateOutput);
+["siteTitle","siteHeroTitle","siteStartYear","siteTerm","siteExtra"].forEach(id =>
+  document.getElementById(id).addEventListener("input", () => { updateSubtitlePreview(); updateOutput(); })
+);
 
 render();
