@@ -128,6 +128,12 @@ const COURSES = [
       { day: 4, startSec: 9, endSec: 11, startWeek: 19, endWeek: 19, location: '7303J' },
     ],
   },
+  {
+    name: '团体心理辅导', credit: 1, teacher: '', note: '',
+    sessions: [
+      { day: 2, startSec: 5, endSec: 6, startWeek: 6, endWeek: 6, location: '心理中心118团辅室' },
+    ],
+  },
 ];
 
 const MAKEUP_CLASSES = [
