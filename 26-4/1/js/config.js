@@ -2,9 +2,15 @@
 // 课程表总配置文件（由编辑器生成）
 // ============================================================
 
+const SITE = {
+  title: '计应26-4班课程表',
+  heroTitle: '计应26-4班课程表',
+  heroSubtitle: '2026–2027 学年第一学期 · 2026年9月7日开学 · 大一上'
+};
+
 const SEMESTER = {
   startDate: '2026-09-07',
-  totalWeeks: 19
+  totalWeeks: 20
 };
 
 const PERIODS = [
@@ -127,7 +133,7 @@ const COURSES = [
     ],
   },
   {
-    name: '团体心理辅导', credit: 1, teacher: '', note: '',
+    name: '团体心理辅导', credit: 0, teacher: '', note: '',
     sessions: [
       { day: 2, startSec: 5, endSec: 6, startWeek: 6, endWeek: 6, location: '心理中心118团辅室' },
     ],
