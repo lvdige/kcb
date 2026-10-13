@@ -127,7 +127,7 @@ const COURSES = [
     ],
   },
   {
-    name: '团体心理辅导', teacher: '', note: '',
+    name: '团体心理辅导', credit: 0, teacher: '', note: '',
     sessions: [
       { day: 2, startSec: 5, endSec: 6, startWeek: 6, endWeek: 6, location: '心理中心118团辅室' },
     ],
